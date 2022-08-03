@@ -74,8 +74,8 @@ docker-compose -f docker-compose.yml up
   我们的docker-compose已经起来了。
 
 我们通过docker-compose ps可以看到我们的docker-compose启动的两个service有2个：
-  ![](../images/11.png)    
-  
+  ![](../images/11.png)   
+   
  我们现在可以通过docker-compose指导docker的启动 停止情况。  
  我们可以通过以下指令查看容器的情况：
    ![](../images/12.png)  
