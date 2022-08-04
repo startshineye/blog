@@ -89,5 +89,8 @@ voting-app、result-app因为要对外部提供访问的，所以都连接：fro
 
 ###### docker-compose build
    如果我们通过docker-compose build时候我们会build镜像，然后docker-compose up的时候会快很多，如果我们直接docker-compose up，其实其
-   做了两步事情，如果我们的app等发生变化，我们通过docker-compose build重新构建镜像。  
+   做了两步事情，如果我们的app等发生变化，我们通过docker-compose build重新构建镜像。
+   
+######  注意
+   docker-compose是用于本地开发的一个工具，所以不是一个部署生产app的一个工具，只是问了方便大家本地做开发，看一个部署的结果。
    
