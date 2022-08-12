@@ -289,6 +289,10 @@ kubectl get pod --all-namespaces
 
 
 
+### 3、备注
+搭建过程中参考: https://www.cnblogs.com/qiaoer1993/p/14504615.html
+
+
 
 
 
