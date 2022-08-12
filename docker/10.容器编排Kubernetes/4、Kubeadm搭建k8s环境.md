@@ -227,12 +227,65 @@ eth1:192.168.205.120/24 这个地址。 这个是因为另外k8s的节点有的�
 
 启动如下:
 ![](../images/34.png) 
-###### 添加kube配置
+
+
+###### 然后主节点上运行:
 
 ```renderscript
-mkdir -p $HOME/.kube  
-sudo cp -i 
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
+
+
+###### 检查pod:
+```renderscript
+kubectl get pod --all-namespaces
+```
+
+运行完毕之后,我们可以看到,在机器上运行启动了很多pod,这些pod其实就是我们的
+container容器。也就是k8s里面重要的组成部分。  
+![](../images/35.png) 
+从上面可以看到我们的很多组件都是Running状态的，只有前两个是Pending状态。这个是
+因为我们还没有来得及安装网络插件。  
+
+
+###### 安装网络插件
+我们直接安装了weave的网络插件即可。  
+
+```renderscript
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+```
+![](../images/36.png)  
+此时我们可以看到我们的前面2个pod已经从Pending变成了Running状态。  
+
+ 
+###### 添加worker节点
+之前在k8s安装的时候，会生成一串添加节点worker的指令串，我们将其粘贴。然后运行：
+Please use sudo join
+
+```renderscript
+sudo kubeadm join 192.168.205.120:6443 --token tte278.145ozal6u6e26ypm --discovery-token-ca-cert-hash sha256:cbb168e0665fe1b14e96a87c2da5dc1eeda04c70932ac1913d989753703277bb
+
+```
+
+然后把我们出现如下状态就说明添加成功了:
+![](../images/37.png)
+
+###### 查看集群状态  
+```renderscript
+kubectl get nodes
+```
+
+  
+###### 查看pod
+
+```renderscript
+kubectl get pod --all-namespaces
+```  
+
+
+我们发现更多的pod已经加入进来了。  
 
 
 
