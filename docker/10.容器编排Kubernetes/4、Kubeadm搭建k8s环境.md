@@ -153,8 +153,7 @@ sudo setenforce 0
 
 # Step 7: install kubeadm, kubectl, and kubelet.
 #sudo yum install -y kubelet kubeadm kubectl
-
-sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo yum install -y kubelet-1.23.6 kubeadm-1.23.6 kubectl-1.23.6 --disableexcludes=kubernetes
 sudo systemctl enable docker && systemctl start docker
 sudo systemctl enable kubelet && systemctl start kubelet
 
@@ -193,6 +192,16 @@ vagrant up
 
 ### 3、进入机器内部查看 
 
+###### 配置hosts
+```renderscript
+$ cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.205.120 k8s-master
+192.168.205.121 k8s-node1
+192.168.205.122 k8s-node2
+```
+
 ###### 进入对应k8s节点的内部:  
 ```renderscript
 vagrant ssh k8s-master
@@ -219,6 +228,12 @@ docker version
 sudo kubeadm init --pod-network-cidr 172.100.0.0/16 --apiserver-advertise-address 192.168.205.120
 ```
 
+如果出现网络超时的错误，可以尝试:
+
+```renderscript
+sudo kubeadm init  --image-repository=registry.aliyuncs.com/google_containers --pod-network-cidr 172.100.0.0/16 --apiserver-advertise-address 192.168.205.120 --kubernetes-version v1.23.6 --ignore-preflight-errors all
+```
+
 ![](../images/33.png) 
 apiserver-advertise-address:这个比较重要，这个是因为我们的k8s-master有多个网络地址，但是我们希望使用的是:
 eth1:192.168.205.120/24 这个地址。 这个是因为另外k8s的节点有的地址是另外一个地址:网断是:192.168.205。  
@@ -226,7 +241,27 @@ eth1:192.168.205.120/24 这个地址。 这个是因为另外k8s的节点有的�
 
 
 启动如下:
-![](../images/34.png) 
+```renderscript
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.205.120:6443 --token 9riv3t.vlfnjuotx0jnvcq6 --discovery-token-ca-cert-hash sha256:df11725a2ff63b834e6780eb8375f55f0cd833fae2cd3e336e60e4307b2e110e 
+```
 
 
 ###### 然后主节点上运行:
@@ -263,12 +298,21 @@ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl versio
 ###### 添加worker节点
 之前在k8s安装的时候，会生成一串添加节点worker的指令串，我们将其粘贴。然后运行：
 Please use sudo join
+ 我们在k8s-node1跟k8s-node2上运行如下指令:
 
 ```renderscript
-sudo kubeadm join 192.168.205.120:6443 --token tte278.145ozal6u6e26ypm --discovery-token-ca-cert-hash sha256:cbb168e0665fe1b14e96a87c2da5dc1eeda04c70932ac1913d989753703277bb
-
+sudo kubeadm join 192.168.205.120:6443 --token 6b8k0y.o7am5vdvha5e4564 --discovery-token-ca-cert-hash sha256:ebc5046953733eb5e69eef3b87f81d8843194f0484a006c9a545878121296e17 
 ```
 
+如果出现问题:
+![](../images/44.png) 
+
+我们执行:
+```renderscript
+sudo swapoff -a
+```
+
+kubeadm join 192.168.205.120:6443 --token 0w8npo.9yllwzaa52seo6tl --discovery-token-ca-cert-hash sha256:3612094b15e430d9b0e1d47a1c3a0534db06f6230fb9c1bb5c9f99993df09d25 
 然后把我们出现如下状态就说明添加成功了:
 ![](../images/37.png)
 
@@ -292,8 +336,43 @@ kubectl get pod --all-namespaces
 ### 3、备注
 搭建过程中参考: https://www.cnblogs.com/qiaoer1993/p/14504615.html
 
+参考二：https://blog.csdn.net/weixin_43168190/article/details/107227626
+
+注意:
+```renderscript
+如果安装的kubelet   kubeadm  kubectl
+是V1.24就会出现以上错误，安装的时候指定一下1.23版本，就可以解决了：yum install -y kubelet-1.23.6 kubeadm-1.23.6 kubectl-1.23.6
+```
 
 
 
+kubeadm join 192.168.205.120:6443 --token 4tjft0.dox1eofnxdrodmzg --discovery-token-ca-cert-hash sha256:a1f0484ebf36778e08ac7b7f0ce902d329ddeff64482181d1c27584dc35f2e15
 
 
+
+kubeadm join 192.168.205.120:6443 --token kiu35h.kn57wtueiyxu9bp7 --discovery-token-ca-cert-hash sha256:f5a6d12e72f952a042a4b1cf8518012d0b3e05143665e1c9d2901fe96c81b233
+
+kubeadm join 192.168.205.120:6443 --token pbpzza.g3j8704qzmefqzpj --discovery-token-ca-cert-hash sha256:91669076fb2827dde9359b8036d7c629b4cc52909850999230b1d7b32c589d90 
+
+kubeadm join 192.168.205.120:6443 --token nzs43q.a7q6558vx4elm8b2 --discovery-token-ca-cert-hash sha256:48af31fd0535078ae51d25ab48098b0b958dd693dd60fd0e42bf03903b1131ad 
+###### linux卸载Kubernetes
+  有时候使用v1.24.3的时候,会出现下载的问题。所以我们需要更换为:
+```renderscript
+sudo yum install -y kubelet-1.23.6 kubeadm-1.23.6 kubectl-1.23.6
+```
+
+ 卸载:
+yum remove -y kubelet kubeadm kubectl
+ 
+sudo kubeadm reset -f
+sudo modprobe -r ipip
+sudo lsmod
+sudo rm -rf ~/.kube/
+sudo rm -rf /etc/kubernetes/
+sudo rm -rf /etc/systemd/system/kubelet.service.d
+sudo rm -rf /etc/systemd/system/kubelet.service
+sudo rm -rf /usr/bin/kube*
+sudo rm -rf /etc/cni
+sudo rm -rf /opt/cni
+sudo rm -rf /var/lib/etcd
+sudo rm -rf /var/etcd
