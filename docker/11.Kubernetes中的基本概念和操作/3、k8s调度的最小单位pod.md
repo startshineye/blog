@@ -37,7 +37,11 @@ spec里面containers就是指代我们的容器:
   通过如下指令:
 ```renderscript
 $ kubectl create -f nginx_busybox.yml
+pod/nginx-busybox created
 ```
+
+ 我们进入本地minikube准备好的环境中的pod下面:
+
 
 ### 4、操作pod
 ###### 获取pods
@@ -64,13 +68,16 @@ kubectl exec nginx-busybox -it sh
 ```
 
 nginx-busybox里面有2个container;默认会进入第一个容器:nginx里面。
-如何进入第二个容器里面呢？后面说
+如何进入第二个容器里面呢？加: -c container
+
+![](../images/48.png)  
 
 ### 4、删除pod
 
 ```renderscript
 kubectl delete -f nginx_busybox.yml
 ```
+
 
 
 
