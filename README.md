@@ -6,6 +6,8 @@ java学习笔记博客整理
 #### 软件架构
 软件架构说明
 
+export YARN_RESOURCEMANAGER_USER
+YARN_NODEMANAGER_USER
 
 #### 安装教程
 
